@@ -4,8 +4,12 @@ export class LoginPage {
   constructor(private page: Page) {}
   private newPage: Page | null = null;
 
-  username: Locator = this.page.locator("#floatingLabelInput34");
-  password: Locator = this.page.locator("#floatingLabelInput39");
+  username: Locator = this.page.locator(
+    "//*[text()='Username or E-mail address']/following-sibling::input"
+  );
+  password: Locator = this.page.locator(
+    "//*[text()='Password']/following-sibling::input"
+  );
   loginButton: Locator = this.page.locator("//button[@type= 'submit']");
   loginLink: Locator = this.page.locator("//a[@class= 'form-submit']");
 

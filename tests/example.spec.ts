@@ -9,8 +9,8 @@ test("has title", async ({ page }) => {
   await loginPage.navigateToLogin();
   let SKUS = await readExcelColumn("data/breaks-ifi.csv", "SKU");
 
-  const email = process.env.LOGIN_EMAIL; // Get email from environment variable
-  const password = process.env.LOGIN_PASSWORD; // Get password from environment variable
+  const email = process.env.LOGIN_EMAIL || "";
+  const password = process.env.LOGIN_PASSWORD || "";
 
   await loginPage.login(email || "", password || ""); // Provide default empty string if undefined
   for (const sku of SKUS) {

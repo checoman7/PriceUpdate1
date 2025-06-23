@@ -1,4 +1,10 @@
 import { defineConfig, devices } from "@playwright/test";
+import * as dotenv from "dotenv";
+import dotenvExpand from "dotenv-expand";
+
+// Cargar y expandir variables de entorno
+const env = dotenv.config();
+dotenvExpand.expand(env);
 
 /**
  * Read environment variables from file.
@@ -42,16 +48,6 @@ export default defineConfig({
     {
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
-    },
-
-    {
-      name: "firefox",
-      use: { ...devices["Desktop Firefox"] },
-    },
-
-    {
-      name: "webkit",
-      use: { ...devices["Desktop Safari"] },
     },
 
     /* Test against mobile viewports. */

@@ -4,10 +4,10 @@ import { readExcelColumn, createCsvFile } from "../utils/ExcelUtils";
 
 const pricesArray: { sku: string; price: string | null }[] = []; // Global array to store SKU and price
 
-test("has title", async ({ page }) => {
+test("Extraer Precios", async ({ page }) => {
   const loginPage = new LoginPage(page);
   await loginPage.navigateToLogin();
-  let SKUS = await readExcelColumn("data/breaks-ifi.csv", "SKU");
+  let SKUS = await readExcelColumn("data/breaks-ifi-40.csv", "SKU");
 
   const email = process.env.LOGIN_EMAIL || "";
   const password = process.env.LOGIN_PASSWORD || "";

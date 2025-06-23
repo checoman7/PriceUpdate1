@@ -37,9 +37,13 @@ export class LoginPage {
   // Method to get the new page context
   async login(user: string, password: string) {
     const usernameLocator =
-      (await this.getNewPageLocator("#floatingLabelInput34")) || this.username;
+      (await this.getNewPageLocator(
+        "//*[text()='Username or E-mail address']/following-sibling::input"
+      )) || this.username;
     const passwordLocator =
-      (await this.getNewPageLocator("#floatingLabelInput39")) || this.password;
+      (await this.getNewPageLocator(
+        "//*[text()='Password']/following-sibling::input"
+      )) || this.password;
     const loginButtonLocator =
       (await this.getNewPageLocator("//button[@type= 'submit']")) ||
       this.loginButton;

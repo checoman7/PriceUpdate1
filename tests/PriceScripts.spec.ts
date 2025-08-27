@@ -1,6 +1,7 @@
 import { test } from "@playwright/test";
 import { LoginPage } from "../pages/LoginPage";
 import { readExcelColumn, createCsvFile } from "../utils/ExcelUtils";
+const excelFilePath = "data/breaks-ifi-40.csv";
 
 interface ProductData {
   sku: string;
@@ -11,10 +12,12 @@ interface ProductData {
   calculatedPrice: string;
 }
 
-test("Extraer Precios", async ({ page }) => {
+test("Extraction with: sku, productName, price,listPrice, weight, calculatedPrice", async ({
+  page,
+}) => {
   const loginPage = new LoginPage(page);
   const productsArray: ProductData[] = [];
-  const SKUS = await readExcelColumn("data/breaks-ifi-40.csv", "SKU");
+  const SKUS = await readExcelColumn(excelFilePath, "SKU");
 
   await loginPage.navigateToLogin();
   await loginPage.login(
@@ -136,7 +139,72 @@ test("Extraer Precios", async ({ page }) => {
     ].join(",")
   );
 
-  createCsvFile([headers.join(","), ...rows], "data/prices.csv");
+  createCsvFile([headers.join(","), ...rows], "data/prices_extra_data.csv");
+
+  // Imprimir resumen
+  console.log("\n=== Processing Summary ===");
+  console.log(`Total items processed: ${productsArray.length}`);
+  console.log(`Total SKUs in input: ${SKUS.length}`);
+});
+
+interface SimpleProductData {
+  sku: string;
+  price: string;
+}
+
+test("Simple Price Extraction: SKU and Price only", async ({ page }) => {
+  const loginPage = new LoginPage(page);
+  const productsArray: SimpleProductData[] = [];
+  const SKUS = await readExcelColumn(excelFilePath, "SKU");
+
+  await loginPage.navigateToLogin();
+  await loginPage.login(
+    process.env.LOGIN_EMAIL || "",
+    process.env.LOGIN_PASSWORD || ""
+  );
+
+  for (const sku of SKUS) {
+    console.log(`Processing SKU: ${sku}`);
+    try {
+      await page.goto(`https://shop.tvh.com/en-us/products/TSA/${sku}`, {
+        waitUntil: "networkidle",
+      });
+
+      await page.waitForLoadState("domcontentloaded");
+
+      // Obtener precio
+      let price = "N/A";
+      try {
+        const priceElement = await page.waitForSelector(
+          "//div[@class='tss-1v9lp4-ProductDetailPageInfoLayout-prices']//span/span/span",
+          { timeout: 15000, state: "visible" }
+        );
+        price = (await priceElement.textContent()) || "N/A";
+      } catch (e) {
+        console.log(`No price found for SKU: ${sku}`);
+      }
+
+      // Agregar producto al array
+      productsArray.push({
+        sku,
+        price,
+      });
+
+      console.log(`Successfully processed SKU: ${sku}`);
+    } catch (error) {
+      console.error(`Error processing SKU ${sku}:`, error);
+      productsArray.push({
+        sku,
+        price: "N/A",
+      });
+    }
+  }
+
+  // Guardar resultados en CSV
+  const headers = ["SKU", "Price"];
+  const rows = productsArray.map((item) => [item.sku, item.price].join(","));
+
+  createCsvFile([headers.join(","), ...rows], "data/simple_prices.csv");
 
   // Imprimir resumen
   console.log("\n=== Processing Summary ===");

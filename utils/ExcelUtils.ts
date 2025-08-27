@@ -1,5 +1,5 @@
-import * as XLSX from "xlsx"; // Necesitas instalar la librería 'xlsx' usando el comando: npm install xlsx
-import * as fs from "fs"; // Asegúrate de tener el módulo 'fs' disponible
+import * as XLSX from "xlsx";
+import * as fs from "fs";
 
 export function readExcelColumn(filePath: string, columnName: string): any[] {
   const workbook = XLSX.readFile(filePath, { codepage: 65001 });
@@ -15,20 +15,17 @@ export function readExcelColumn(filePath: string, columnName: string): any[] {
   const columnData = data
     .slice(1)
     .map((row: any[]) => row[columnIndex])
-    .filter((value: undefined) => value !== undefined); // Filtrar valores indefinidos
+    .filter((value: undefined) => value !== undefined);
   return columnData;
 }
 
-// BEGIN: abpxx6d04wxr
-
 export function createCsvFile(data: string[], filePath: string): void {
-  const formattedData = data.map((item) => {
-    const [skuPart, pricePart] = item.split(", ");
-    const sku = skuPart.split(": ")[1];
-    const price = pricePart.split(": ")[1];
-    return `${sku},${price}`; // Formato CSV
-  });
+  // Simplemente escribir las líneas directamente al archivo
+  // Ya que ahora los datos vienen formateados correctamente desde example.spec.ts
+  const csvContent = data.join("\n");
+  fs.writeFileSync(filePath, csvContent);
 
-  const csvContent = ["SKU,Price", ...formattedData].join("\n"); // Encabezados y contenido
-  fs.writeFileSync(filePath, csvContent); // Escribir en archivo CSV
+  // Log para verificar que se escribió correctamente
+  console.log(`File saved successfully at: ${filePath}`);
+  console.log(`Total rows written: ${data.length}`);
 }
